@@ -22,4 +22,14 @@ public class Fleet
         this.player = player;
         entityList = new ArrayList<>();
     }
+
+    public void moveAllEntities()
+    {
+
+    }
+
+    public void attackTarget()
+    {
+
+    }
 }

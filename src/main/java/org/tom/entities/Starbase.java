@@ -20,9 +20,11 @@ public class Starbase extends Entity
 
     private final List<Starship> dockedStarships;
 
+
     /**
      * Sets the base values for a Starbase. Passes the static final maximum values to the parent constructor
      * and initialises <code>dockedStarships</code>.
+     *
      * @param position the starting position of the entity
      */
     public Starbase(Sector position)
@@ -44,4 +46,16 @@ public class Starbase extends Entity
     {
         return 0; //maxDefenceStrength * (health / maxHealth);
     }
+
+
+    public void dockStarship(Starship starship)
+    {
+    }
+
+
+    public void undockStarship(Starship starship)
+    {
+    }
+
+
 }

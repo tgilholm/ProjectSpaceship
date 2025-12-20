@@ -1,5 +1,8 @@
 package org.tom.entities;
 
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
+
 /**
  * The Starship Entity inherits base values <code>maxHealth</code>, <code>maxDefenceStrength</code>, <code>position</code> from
  * Entity. <br>Starships have the following pre-set values:
@@ -68,28 +71,70 @@ public class Starship extends Entity
 
 
     /**
+     * Sets crew to a specified <code>newCrew</code> amount. Ensures that the crew count
+     * never falls below 1 using <code>Math.max</code>
+     * <p>
+     * Note: is package-private (no keyword) to allow access to test methods
+     * </p>
+     *
+     * @param newCrew the new number of crew
+     */
+    void setCrew(int newCrew)
+    {
+        // If newCrew < 1, set crew to 1 instead
+        this.crew = Math.max(1, newCrew);
+    }
+
+
+    /**
+     * Moves this <code>Starship</code> to the specified <code>Sector</code>
+     * <p>
+     * Note: this method is not part of the parent class <code>Entity</code>;
+     * not all entities are able to move</p>
+     *
+     * @param newSector the new <code>Sector</code> object
+     */
+    void setSector(@NotNull Sector newSector)
+    {
+        logger.info("Moving starship {} from sector {} to {}", this, getSector(), newSector);
+        this.sector = newSector;
+    }
+
+
+    /**
+     * Gets the <code>docked</code> boolean from this <code>Starship</code>
+     *
+     * @return true if the ship is docked, false otherwise
+     */
+    public boolean getDocked()
+    {
+        return this.docked;
+    }
+
+
+    /**
      * Docks this <code>Starship</code> to the provided <code>Starbase</code>
+     *
      * @param starbase the <code>Starbase</code> to dock to
      */
-    public void dockToStarbase(Starbase starbase)
+    public void dockToStarbase(@NotNull Starbase starbase)
     {
-
+        starbase.dockStarship(this);
+        this.docked = true;
+        logger.info("Docked starship {} to starbase {}", this, starbase);
     }
 
 
     /**
      * Undocks this <code>Starship</code> from the specified <code>Starbase</code>
+     *
      * @param starbase the <code>Starbase</code> to undock from
      */
-    public void undockFromStarbase(Starbase starbase)
+    public void undockFromStarbase(@NotNull Starbase starbase)
     {
-
-    }
-
-
-    public void moveToSector(Sector newSector)
-    {
-
+        starbase.undockStarship(this);
+        this.docked = false;
+        logger.info("Undocked starship {} from starbase {}", this, starbase);
     }
 
 
@@ -98,21 +143,41 @@ public class Starship extends Entity
 
     }
 
-    public void attack(Entity target)
-    {
 
+    /**
+     * Attacks an <code>Entity</code> with the current attack strength of this <code>Starship</code>
+     * @param target the <code>Entity</code> to attack
+     */
+    public void attack(@NonNull Entity target)
+    {
+        target.takeDamage(getAttackStrength());
     }
 
 
     /**
-     * Sets crew to a specified <code>newCrew</code> amount. Ensures that the crew count
-     * never falls below 1 using <code>Math.max</code>
-     * @param newCrew the new amount of crew
+     * Overrides the <code>takeDamage</code> method from <code>Entity</code>.
+     * Executes the base method and then removes crew
+     * @param damage the incoming damage, as a <code>double</code>
      */
-    void setCrew(int newCrew)
+    @Override
+    public void takeDamage(double damage)
     {
-        // If newCrew < 1, set crew to 1 instead
-        this.crew = Math.max(1, newCrew);
+        super.takeDamage(damage);
+        
+        // Remove crew
+        setCrew(crew - calculateCrewLost(damage));
+    }
+
+
+    /**
+     * Helper method to calculate the amount of crew lost based on the current crew and the
+     * ratio between the attack damage and the max health of this <code>Starship</code>
+     * @param damage the incoming damage, as a <code>double</code>
+     * @return the amount of crew lost, as an <code>int</code>
+     */
+    int calculateCrewLost(double damage)
+    {
+        return Math.round((float) (damage / maxHealth) * crew);
     }
 
 }

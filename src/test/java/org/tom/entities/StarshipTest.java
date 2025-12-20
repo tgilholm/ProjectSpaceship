@@ -1,9 +1,6 @@
 package org.tom.entities;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 // Import static assert methods for readability
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,8 +39,7 @@ class StarshipTest
     @DisplayName("Test starship defence strength calculation")
     void getDefenceStrength()
     {
-
-        assertEquals(10, starship.getDefenceStrength(),"Initial defence strength should be 10");
+        assertEquals(10, starship.getDefenceStrength(), "Initial defence strength should be 10");
 
         // Do some damage to the starship
         starship.setHealth(50);
@@ -52,5 +48,29 @@ class StarshipTest
         // Remove some crew from the starship
         starship.setCrew(3);
         assertEquals(4.818181818181818, starship.getDefenceStrength(), delta, "Defence strength should scale with health and crew");
+    }
+
+
+    @Test
+    @DisplayName("Test starship attack strength calculation")
+    void getAttackStrength()
+    {
+        assertEquals(30, starship.getAttackStrength(), "Initial attack strength should be 30");
+
+        // Do some damage to the starship
+        starship.setHealth(50);
+        assertEquals(15, starship.getAttackStrength(), delta, "Attack strength should scale with health");
+    }
+
+
+    @Test
+    void takeDamage()
+    {
+    }
+
+
+    @Test
+    void calculateCrewLost()
+    {
     }
 }

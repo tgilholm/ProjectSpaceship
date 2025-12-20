@@ -44,3 +44,6 @@ bin/
 .DS_Store
 /.idea/
 /.idea/
+/lib/annotations-26.0.2-sources.jar
+/lib/annotations-26.0.2.jar
+/lib/annotations-26.0.2-javadoc.jar

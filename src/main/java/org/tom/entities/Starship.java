@@ -1,7 +1,6 @@
 package org.tom.entities;
 
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 /**
  * The Starship Entity inherits base values <code>maxHealth</code>, <code>maxDefenceStrength</code>, <code>position</code> from
@@ -148,7 +147,7 @@ public class Starship extends Entity
      * Attacks an <code>Entity</code> with the current attack strength of this <code>Starship</code>
      * @param target the <code>Entity</code> to attack
      */
-    public void attack(@NonNull Entity target)
+    public void attack(@NotNull Entity target)
     {
         target.takeDamage(getAttackStrength());
     }

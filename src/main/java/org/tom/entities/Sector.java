@@ -2,25 +2,7 @@ package org.tom.entities;
 
 /**
  * Defines a location on the map grid with an x and y coordinate.
+ * Defined as a record as this is purely a data-carrier class.
  */
-public class Sector
-{
-    private final int x;
-    private final int y;
+public record Sector(int x, int y) {}
 
-    public Sector(int x, int y)
-    {
-        this.x = x;
-        this.y = y;
-    }
-
-    public int getX()
-    {
-        return x;
-    }
-
-    public int getY()
-    {
-        return y;
-    }
-}

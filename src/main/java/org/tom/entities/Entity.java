@@ -2,6 +2,7 @@ package org.tom.entities;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -9,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class Entity
 {
+    protected static final Logger logger = LogManager.getLogger();
     protected final double maxHealth;
     protected final double maxDefenceStrength;
     private static final AtomicLong NEXT_ID = new AtomicLong(1); // Used for entity IDs
@@ -16,7 +18,7 @@ public abstract class Entity
 
     protected double health;
     protected double defenceStrength;
-    protected Sector position;
+    protected Sector sector;
 
 
     /**
@@ -25,14 +27,14 @@ public abstract class Entity
      *
      * @param maxHealth          the maximum total health
      * @param maxDefenceStrength the maximum resistance to damage
-     * @param position           the starting position of the entity
+     * @param sector           the starting position of the entity
      */
-    public Entity(double maxHealth, double maxDefenceStrength, Sector position)
+    public Entity(double maxHealth, double maxDefenceStrength, Sector sector)
     {
         this.id = NEXT_ID.getAndIncrement();    // Get the id from the AtomicLong and increment for uniqueness
         this.maxHealth = maxHealth;
         this.maxDefenceStrength = maxDefenceStrength;
-        this.position = position;
+        this.sector = sector;
 
         // Set values to maximum initially
         health = maxHealth;
@@ -94,7 +96,7 @@ public abstract class Entity
         this.health -= (health - Math.max(0.0, damage - getDefenceStrength()));
     }
 
-
+    /**
      * Returns the unique id of this <code>Entity</code>
      *
      * @return a <code>long</code> id
@@ -116,12 +118,4 @@ public abstract class Entity
         // Gets the class name (e.g. Starship), then appends "#id" where id is the unique id
         return getClass().getSimpleName() + "#" + id;
     }
-
-
-    /**
-     * Calculates the current defence strength of this entity
-     *
-     * @return a <code>double</code> representing the current defence strength
-     */
-    public abstract double getDefenceStrength();
 }

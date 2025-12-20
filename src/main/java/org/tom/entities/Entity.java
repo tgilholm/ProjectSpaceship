@@ -36,4 +36,42 @@ public abstract class Entity
      * @return a <code>double</code> representing the current defence strength
      */
     public abstract double getDefenceStrength();
+
+
+    public double getHealth()
+    {
+        return health;
+    }
+
+
+    /**
+     * Subtracts the incoming damage, reduced by the <code>defenceStrength</code> of this entity.
+     * Prevents <code>health</code> from falling below 0.
+     * @param damage the incoming damage, as a <code>double</code>
+     */
+    public void takeDamage(double damage)
+    {
+        /*
+        If damage minus defenceStrength results in a negative number,
+        take away 0 health instead of adding health
+         */
+        this.health -= (health - Math.max(0.0, damage - getDefenceStrength()));
+    }
+
+
+    /**
+     * Sets the health of this <code>Entity</code> from a provided <code>newHealth</code>. Prevents
+     * negative health by selecting the largest value from 0 or newHealth- if newHealth is negative,
+     * health is set to 0
+     * @param newHealth the new health <code>double</code>
+     */
+    void setHealth(double newHealth)
+    {
+        this.health = Math.max(0.0, newHealth);
+    }
+
+    public Sector getPosition()
+    {
+        return position;
+    }
 }

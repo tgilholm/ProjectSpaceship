@@ -126,15 +126,10 @@ public class Starship extends Entity
      */
     public void dockToStarbase(@NotNull Starbase starbase)
     {
-        // Set the starbase variable to the new base
         if (starbase.dockStarship(this))
         {
             this.docked = true;
             this.starbase = starbase;
-            logger.info("Docked starship: {} to starbase: {}", this, starbase);
-        } else
-        {
-            logger.info("Cannot dock starship: {} to starbase: {}", this, starbase);
         }
     }
 
@@ -146,9 +141,12 @@ public class Starship extends Entity
      */
     public void undockFromStarbase(@NotNull Starbase starbase)
     {
-        starbase.undockStarship(this);
-        this.docked = false;
-        logger.info("Undocked starship: {} from starbase: {}", this, starbase);
+        if (starbase.undockStarship(this))
+        {
+            // Remove starbase reference
+            this.docked = false;
+            this.starbase = null;
+        }
     }
 
 

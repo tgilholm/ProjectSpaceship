@@ -39,6 +39,7 @@ public class Starship extends Entity
 
         crew = maxCrew;         // Maximum crew for new ships
         docked = false;         // Undocked by default
+        starbase = null;
         repairing = false;      // Not repairing by default
     }
 
@@ -95,8 +96,15 @@ public class Starship extends Entity
      */
     void setSector(@NotNull Sector newSector)
     {
-        logger.info("Moving starship {} from sector {} to {}", this, getSector(), newSector);
-        this.sector = newSector;
+        // Only allow movement if undocked
+        if (!this.docked)
+        {
+            logger.info("Moving starship: {} from sector: {} to: {}", this, getSector(), newSector);
+            this.sector = newSector;
+        } else
+        {
+            logger.info("Starship: {} is docked and cannot move", this);
+        }
     }
 
 
@@ -118,9 +126,16 @@ public class Starship extends Entity
      */
     public void dockToStarbase(@NotNull Starbase starbase)
     {
-        starbase.dockStarship(this);
-        this.docked = true;
-        logger.info("Docked starship {} to starbase {}", this, starbase);
+        // Set the starbase variable to the new base
+        if (starbase.dockStarship(this))
+        {
+            this.docked = true;
+            this.starbase = starbase;
+            logger.info("Docked starship: {} to starbase: {}", this, starbase);
+        } else
+        {
+            logger.info("Cannot dock starship: {} to starbase: {}", this, starbase);
+        }
     }
 
 
@@ -133,7 +148,7 @@ public class Starship extends Entity
     {
         starbase.undockStarship(this);
         this.docked = false;
-        logger.info("Undocked starship {} from starbase {}", this, starbase);
+        logger.info("Undocked starship: {} from starbase: {}", this, starbase);
     }
 
 
@@ -144,25 +159,45 @@ public class Starship extends Entity
 
 
     /**
-     * Attacks an <code>Entity</code> with the current attack strength of this <code>Starship</code>
+     * Attacks an <code>Entity</code> with the current attack strength of this <code>Starship</code>.
+     * Attacking is only permitted if the target entity is in the enemy fleet and in the same sector,
+     * and this <code>Starship</code> is not docked
+     *
      * @param target the <code>Entity</code> to attack
      */
     public void attack(@NotNull Entity target)
     {
-        target.takeDamage(getAttackStrength());
+        // Check if undocked
+        if (!this.docked)
+        {
+            // Check if both entities are in the same sector
+            if (target.getSector() == this.sector)
+            {
+                logger.info("Starship: {} attacking entity: {}", this, target);
+                target.takeDamage(getAttackStrength());
+            } else
+            {
+                logger.info("Starship: {} cannot attack entity: {} - they are not in the same sector", this, target);
+            }
+
+        } else
+        {
+            logger.info("Starship: {} is docked and cannot attack", this);
+        }
     }
 
 
     /**
      * Overrides the <code>takeDamage</code> method from <code>Entity</code>.
      * Executes the base method and then removes crew
+     *
      * @param damage the incoming damage, as a <code>double</code>
      */
     @Override
     public void takeDamage(double damage)
     {
         super.takeDamage(damage);
-        
+
         // Remove crew
         setCrew(crew - calculateCrewLost(damage));
     }
@@ -171,6 +206,7 @@ public class Starship extends Entity
     /**
      * Helper method to calculate the amount of crew lost based on the current crew and the
      * ratio between the attack damage and the max health of this <code>Starship</code>
+     *
      * @param damage the incoming damage, as a <code>double</code>
      * @return the amount of crew lost, as an <code>int</code>
      */

@@ -1,5 +1,7 @@
 package org.tom.entities;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,8 +50,24 @@ public class Starbase extends Entity
     }
 
 
-    public void dockStarship(Starship starship)
+    /**
+     * Adds an incoming starship to this <code>Starbase</code> object's list of docked starships.
+     * Checks if the starbase is already in the list of docked ships or is docked to any other bases.
+     * @param starship a <code>Starship</code> object
+     */
+    public boolean dockStarship(@NonNull Starship starship)
     {
+        // If the starship is not docked to this (or any other) starbase
+        if (!starship.getDocked() && !(this.dockedStarships.contains(starship)))
+        {
+            // Add it to the list
+            this.dockedStarships.add(starship);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 

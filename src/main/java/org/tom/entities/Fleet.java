@@ -11,25 +11,48 @@ import java.util.List;
 public class Fleet
 {
     private final Player player;
-    private final List<Entity> entityList;
+    private final List<Starbase> starbases;
+    private final List<Starship> starships;
+
 
     /**
-     * Sets the base values for a Fleet and initialises the <code>entityList</code>
-     * @param player the entities.Player who owns this Fleet
+     * Sets the base values for a Fleet and initializes the <code>entityList</code>
+     *
+     * @param player    the Player who owns this Fleet
+     * @param starbases a list of <code>Starbase</code> objects
+     * @param starships a list of <code>Starship</code> objects
      */
-    public Fleet(Player player)
+    public Fleet(Player player, List<Starbase> starbases, List<Starship> starships)
     {
         this.player = player;
-        entityList = new ArrayList<>();
+        this.starbases = starbases;
+        this.starships = starships;
     }
 
-    public void moveAllEntities()
-    {
 
+    /**
+     * Moves all the <code>Starship</code> entities in the <code>starships</code> list to the given sector.
+     * Docked starships are not moved
+     */
+    public void moveAllEntities(Sector newSector)
+    {
+        for (Starship starship : starships)
+        {
+            starship.setSector(newSector);
+        }
     }
 
-    public void attackTarget()
-    {
 
+    /**
+     * Commands all <code>Starship</code> entities to attack a target <code>Entity</code>. Docked starships will
+     * not be moved, and the attack will only take place if the target is in the same sector as the fleet and of
+     * an opposing fleet.
+     */
+    public void attackTarget(Entity target)
+    {
+        for (Starship starship : starships)
+        {
+            starship.attack(target);
+        }
     }
 }

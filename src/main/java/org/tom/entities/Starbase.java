@@ -4,7 +4,6 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The Starbase Entity. Inherits base values <code>maxHealth</code>, <code>maxDefenceStrength</code>, <code>position</code> from
@@ -66,9 +65,10 @@ public class Starbase extends Entity
 
     /**
      * Helper method to sum the defence strength of a list of <code>Starship</code> objects
+     *
      * @return a <code>double</code> value of the total
      */
-    private double getDockedShipsStrength(@NonNull List<Starship> dockedStarships)
+    double getDockedShipsStrength(@NonNull List<Starship> dockedStarships)
     {
         // Get the sum of the defence strength of each ship
         return dockedStarships.stream()
@@ -103,6 +103,7 @@ public class Starbase extends Entity
     /**
      * Attempts to undock a <code>Starship</code> from this <code>Starbase</code>. Checks if the starship
      * is docked and appears in this starbase's list of starships.
+     *
      * @param starship the <code>Starship</code> entity to undock
      * @return true if undocking succeeded, false otherwise
      */
@@ -120,8 +121,6 @@ public class Starbase extends Entity
             return false;
         }
     }
-
-
 
 
 }

@@ -19,6 +19,7 @@ public abstract class Entity
     protected double health;
     protected double defenceStrength;
     protected Sector sector;
+    protected Fleet fleet;      // The fleet this entity is in
 
 
     /**

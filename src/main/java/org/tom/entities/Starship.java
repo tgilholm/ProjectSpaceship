@@ -116,6 +116,8 @@ public class Starship extends Entity
             {
                 logger.debug("{} is docked and cannot move", this);
             }
+
+            return;
         }
 
         // Make the move if all checks succeeded
@@ -183,6 +185,9 @@ public class Starship extends Entity
         {
             // Undock the ship
             this.docked = false;
+
+            // Stop repairing
+            this.repairing = false;
         }
     }
 
@@ -259,6 +264,8 @@ public class Starship extends Entity
             {
                 logger.debug("{} is docked and cannot attack", this);
             }
+
+            return;
         }
 
         // Check if both entities are in the same sector
@@ -289,8 +296,12 @@ public class Starship extends Entity
     @Override
     public void takeDamage(double damage)
     {
+        // Get current health before modifying
+        double priorHealth = this.health;
         super.takeDamage(damage);
-        double appliedDamage = Math.min(Math.max(5, damage - defenceStrength), this.health);
+
+        // Use the priorHealth calculate the drop in health
+        double appliedDamage = Math.max(0, priorHealth - this.health);
 
         // Remove crew based on applied damage, not total damage
         int crewLost = calculateCrewLost(appliedDamage);

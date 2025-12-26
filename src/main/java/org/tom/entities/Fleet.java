@@ -149,7 +149,7 @@ public class Fleet
                 continue;
             }
 
-            // Dock the starbase if the check succeeded
+            // Dock the starship if the check succeeded
             s.dockToStarbase(starbase);
         }
     }

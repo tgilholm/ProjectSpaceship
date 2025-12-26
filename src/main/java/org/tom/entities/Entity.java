@@ -139,6 +139,7 @@ public abstract class Entity
         if (destroyed)
         {
             logger.info("{} has been destroyed. Taking 0 damage", this);
+            return;
         }
 
         // Incoming damage is damage-defenceStrength, or 5, whichever is higher
@@ -151,17 +152,16 @@ public abstract class Entity
     }
 
 
-
-/**
- * Overrides <code>toString</code> in <code>Object</code>. Outputs the class name
- * and unique ID for logging
- *
- * @return a <code>String</code> output of this object
- */
-@Override
-public String toString()
-{
-    // Gets the class name (e.g. Starship), then appends "#id" where id is the unique id
-    return "{" + getFleet() + "} " + getClass().getSimpleName() + "#" + id;
-}
+    /**
+     * Overrides <code>toString</code> in <code>Object</code>. Outputs the class name
+     * and unique ID for logging
+     *
+     * @return a <code>String</code> output of this object
+     */
+    @Override
+    public String toString()
+    {
+        // Gets the class name (e.g. Starship), then appends "#id" where id is the unique id
+        return "{" + getFleet() + "} " + getClass().getSimpleName() + "#" + id;
+    }
 }

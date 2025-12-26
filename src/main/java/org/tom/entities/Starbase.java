@@ -2,7 +2,10 @@ package org.tom.entities;
 
 import org.jspecify.annotations.NonNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * The Starbase Entity. Inherits base values <code>maxHealth</code>, <code>maxDefenceStrength</code>, <code>position</code> from
@@ -137,7 +140,7 @@ public class Starbase extends Entity
         // Check if this starbase is destroyed
         if (destroyed)
         {
-            logger.info("{} has been destroyed. Cannot undock starships", this);
+            logger.debug("{} has been destroyed. Cannot undock starships", this);
             return false;
         }
 
@@ -157,13 +160,16 @@ public class Starbase extends Entity
         {
             // If not, log it
             logger.debug("{} is not docked to {}, cannot undock", starship, this);
-            logger.debug("docked {}", starship.getDocked());
             return false;
         }
 }
 
 
-    public List<Starship> getDockedStarships()
+    /**
+     * Exposes a package-private unmodifiable version of the <code>dockedStarships</code> list
+     * @return a list of <code>Starship</code> objects
+     */
+    List<Starship> getDockedStarships()
     {
         return Collections.unmodifiableList(dockedStarships);
     }

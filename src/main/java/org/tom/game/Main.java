@@ -4,13 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.tom.entities.*;
 
-import java.util.List;
 
 public class Main
 {
-    private final static Logger logger = LogManager.getLogger();
-
-
     /**
      * Executes the demo sequence
      *
@@ -39,7 +35,14 @@ public class Main
         // Move all player 1 ships to sector 2
         fleet1.moveAllEntities(sector2);
 
-        // Dock two ships from the player 2 fleet to the starbase
+        /*
+        Gets the first starbase in fleet2. If it exists (ifPresent), get the first two starships and if they
+        exist, dock them to the starbase.
+         */
+        fleet2.getStarbaseAt(0).ifPresent(starbase -> {
+            fleet2.getStarshipAt(0).ifPresent(s1 -> fleet2.dockStarshipsTo(starbase, s1));
+            fleet2.getStarshipAt(1).ifPresent(s2 -> fleet2.dockStarshipsTo(starbase, s2));
+        });
 
     }
 }

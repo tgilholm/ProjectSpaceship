@@ -121,6 +121,4 @@ public class Starbase extends Entity
             return false;
         }
     }
-
-
 }

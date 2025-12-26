@@ -6,6 +6,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The Fleet object serves to associate player ownership with a group of Entities
@@ -17,11 +18,12 @@ public class Fleet
     private final Player player;
     private final List<Starbase> starbases;
     private final List<Starship> starships;
-    private final static Logger logger = LogManager.getLogger();
+    protected final static Logger logger = LogManager.getLogger();
 
 
     /**
      * Overrides <code>toString</code> from <code>Object</code> superclass
+     *
      * @return the fleet name including the player number
      */
     @Override
@@ -29,6 +31,7 @@ public class Fleet
     {
         return "Fleet#" + player.playerNo();
     }
+
 
     /**
      * Sets the base values for a Fleet and initializes the entity lists
@@ -64,8 +67,10 @@ public class Fleet
      * Commands all <code>Starship</code> entities to attack a target <code>Entity</code>. Docked starships will
      * not be moved, and the attack will only take place if the target is in the same sector as the fleet and of
      * an opposing fleet.
+     *
+     * @param target the <code>Entity</code> to attack
      */
-    public void attackTarget(Entity target)
+    public void attackWithAll(Entity target)
     {
         for (Starship starship : starships)
         {
@@ -104,20 +109,47 @@ public class Fleet
 
 
     /**
-     * Get the starbases in this fleet
-     * @return a list of <code>Starbase</code> objects
+     * Gets the specific <code>Starbase</code> object at the specified index.
+     *
+     * @return an <code>Optional</code> object with a <code>Starbase</code> if found, or empty otherwise
      */
-    public List<Starbase> getStarbases()
+    public Optional<Starbase> getStarbaseAt(int index)
     {
-        return starbases;
+        // If the index is negative or larger than the starbase list size, return empty
+        if (index < 0 || index >= starbases.size()) return Optional.empty();
+        return Optional.of(starbases.get(index)); // Otherwise return the starbase
     }
 
+
     /**
-     * Get the starships in this fleet
-     * @return a list of <code>Starship</code> objects
+     * Gets the specific <code>Starship</code> object at the specified index
+     *
+     * @return an <code>Optional</code> object with a <code>Starship</code> if found, or empty otherwise
      */
-    public List<Starship> getStarships()
+    public Optional<Starship> getStarshipAt(int index)
     {
-        return starships;
+        if (index < 0 || index >= starships.size()) return Optional.empty();
+        return Optional.of(starships.get(index));
+    }
+
+
+    /**
+     * Docks the specified <code>Starship</code> objects to a <code>Starbase</code>
+     *
+     * @param starbase  the <code>Starbase</code> to dock to
+     * @param starships the <code>Starship</code> objects to dock (varargs, any no of starships)
+     */
+    public void dockStarshipsTo(Starbase starbase, Starship @NonNull ... starships)
+    {
+        for (Starship s : starships)
+        {
+            if (!this.starships.contains(s) || !starbases.contains(starbase))
+            {
+                logger.info("Cannot dock: ship {} or base {} not in {}", s, starbase, this);
+            } else
+            {
+                s.dockToStarbase(starbase);
+            }
+        }
     }
 }

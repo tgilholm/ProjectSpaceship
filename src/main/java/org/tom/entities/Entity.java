@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class Entity
 {
     protected static final Logger logger = LogManager.getLogger();
+    private static final AtomicLong NEXT_ID = new AtomicLong(1); // Used for entity IDs
     protected final double maxHealth;
     protected final double maxDefenceStrength;
-    private static final AtomicLong NEXT_ID = new AtomicLong(1); // Used for entity IDs
     private Fleet fleet;      // The fleet this entity is in
     private final long id;
 
@@ -100,7 +100,7 @@ public abstract class Entity
      *
      * @param newHealth the new health <code>double</code>
      */
-    void setHealth(double newHealth)
+    public void setHealth(double newHealth)
     {
         this.health = Math.max(0.0, Math.min(newHealth, maxHealth));
     }
@@ -110,7 +110,7 @@ public abstract class Entity
      * Used to assign fleet ownership to entities. Not in the constructor to avoid long argument lists
      * @param fleet the fleet that owns this <code>Entity</code>
      */
-    void setFleet(Fleet fleet)
+    public void setFleet(Fleet fleet)
     {
         this.fleet = fleet;
     }

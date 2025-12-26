@@ -99,11 +99,11 @@ public class Fleet
             if (e instanceof Starship)
             {
                 starships.add((Starship) e);    // Add to the starship l
-                logger.info("Adding {} to fleet {}", e, this);
             } else if (e instanceof Starbase)
             {
                 starbases.add((Starbase) e);    // Add to the starbase list
             }
+            logger.info("Adding {} to fleet {}", e, this);
         }
     }
 

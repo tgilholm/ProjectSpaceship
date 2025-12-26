@@ -129,6 +129,7 @@ public abstract class Entity
         take away 0 health instead of adding health
          */
         this.setHealth(health - Math.max(0.0, damage - getDefenceStrength()));
+        logger.info("{} taking {} damage. Remaining health: {}", this, damage, getHealth());
     }
 
 

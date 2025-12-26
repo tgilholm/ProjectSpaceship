@@ -7,6 +7,7 @@ import org.tom.entities.*;
 
 public class Main
 {
+
     /**
      * Executes the demo sequence
      *
@@ -39,10 +40,33 @@ public class Main
         Gets the first starbase in fleet2. If it exists (ifPresent), get the first two starships and if they
         exist, dock them to the starbase.
          */
-        fleet2.getStarbaseAt(0).ifPresent(starbase -> {
+        fleet2.getStarbaseAt(0).ifPresent(starbase ->
+        {
             fleet2.getStarshipAt(0).ifPresent(s1 -> fleet2.dockStarshipsTo(starbase, s1));
             fleet2.getStarshipAt(1).ifPresent(s2 -> fleet2.dockStarshipsTo(starbase, s2));
         });
 
+        //Get the first ship from fleet1. If it exists, attack the remaining undocked starship in fleet2 twice
+        fleet1.getStarshipAt(0).ifPresent(starship ->
+                fleet2.getStarshipAt(2).ifPresent(enemy ->
+                {
+                    starship.attack(enemy);
+                    starship.attack(enemy);
+                }));
+
+        //Dock the undocked fleet2 starship to the starbase and set it to repair
+        fleet2.getStarshipAt(2).ifPresent(starship ->
+                fleet2.getStarbaseAt(0).ifPresent(starbase -> {
+                    starship.dockToStarbase(starbase);
+                    starship.repair();  // todo implement repair
+                }));
+
+        // Command fleet1 to attack fleet2's starbase until it is destroyed
+        fleet2.getStarbaseAt(0).ifPresent(starbase -> {
+            while (starbase.getHealth() > 0)
+            {
+                fleet1.attackWithAll(starbase);
+            }
+        });
     }
 }

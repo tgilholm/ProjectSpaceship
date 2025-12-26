@@ -1,5 +1,10 @@
 package org.tom.entities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.NonNull;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,20 +17,31 @@ public class Fleet
     private final Player player;
     private final List<Starbase> starbases;
     private final List<Starship> starships;
+    private final static Logger logger = LogManager.getLogger();
 
 
     /**
-     * Sets the base values for a Fleet and initializes the <code>entityList</code>
-     *
-     * @param player    the Player who owns this Fleet
-     * @param starbases a list of <code>Starbase</code> objects
-     * @param starships a list of <code>Starship</code> objects
+     * Overrides <code>toString</code> from <code>Object</code> superclass
+     * @return the fleet name including the player number
      */
-    public Fleet(Player player, List<Starbase> starbases, List<Starship> starships)
+    @Override
+    public String toString()
+    {
+        return "Fleet#" + player.playerNo();
+    }
+
+    /**
+     * Sets the base values for a Fleet and initializes the entity lists
+     *
+     * @param player the Player who owns this Fleet
+     */
+    public Fleet(Player player)
     {
         this.player = player;
-        this.starbases = starbases;
-        this.starships = starships;
+
+        // Initialize the lists
+        starbases = new ArrayList<>();
+        starships = new ArrayList<>();
     }
 
 
@@ -35,6 +51,8 @@ public class Fleet
      */
     public void moveAllEntities(Sector newSector)
     {
+        logger.debug("Moving {} starships from {} to sector {}", starships.size(), this, newSector);
+
         for (Starship starship : starships)
         {
             starship.setSector(newSector);
@@ -53,5 +71,53 @@ public class Fleet
         {
             starship.attack(target);
         }
+    }
+
+
+    /**
+     * Adds entities to this fleet. Separates the list of entities into <code>Starbase</code> and <code>Starship</code>
+     * objects and adds them to the corresponding lists
+     *
+     * @param entities a varargs list of <code>Entity</code> objects taking any number of objects
+     */
+    public void addEntities(Entity @NonNull ... entities)
+    {
+        for (Entity e : entities)
+        {
+            /*
+            Add starship entities to the starship list and starbases to the starbase list
+            First check the class type, then safely cast to the corresponding type.
+            Sets the Fleet variable of the entity to this.
+             */
+            e.setFleet(this);
+
+            if (e.getClass() == Starship.class)
+            {
+                starships.add((Starship) e);    // Add to the starship l
+                logger.info("Adding {} to fleet {}", e, this);
+            } else if (e.getClass() == Starbase.class)
+            {
+                starbases.add((Starbase) e);    // Add to the starbase list
+            }
+        }
+    }
+
+
+    /**
+     * Get the starbases in this fleet
+     * @return a list of <code>Starbase</code> objects
+     */
+    public List<Starbase> getStarbases()
+    {
+        return starbases;
+    }
+
+    /**
+     * Get the starships in this fleet
+     * @return a list of <code>Starship</code> objects
+     */
+    public List<Starship> getStarships()
+    {
+        return starships;
     }
 }

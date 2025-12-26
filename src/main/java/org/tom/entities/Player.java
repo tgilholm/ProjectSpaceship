@@ -1,11 +1,11 @@
 package org.tom.entities;
 
-public class Player
-{
-    private final int playerNo;
+import jdk.jfr.Unsigned;
 
-    public Player(int playerNo)
-    {
-        this.playerNo = playerNo;
-    }
-}
+/**
+ * The <code>Player</code> record acts as a wrapper around a <code>int</code> player number.
+ * This allows future extensibility with wins, high scores, etc.
+ * @param playerNo the unique player number of this object
+ */
+public record Player(@Unsigned int playerNo)
+{}

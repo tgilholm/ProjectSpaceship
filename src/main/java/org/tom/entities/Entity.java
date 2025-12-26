@@ -14,12 +14,12 @@ public abstract class Entity
     protected final double maxHealth;
     protected final double maxDefenceStrength;
     private static final AtomicLong NEXT_ID = new AtomicLong(1); // Used for entity IDs
+    private Fleet fleet;      // The fleet this entity is in
     private final long id;
 
     protected double health;
     protected double defenceStrength;
     protected Sector sector;
-    protected Fleet fleet;      // The fleet this entity is in
 
 
     /**
@@ -36,12 +36,22 @@ public abstract class Entity
         this.maxHealth = maxHealth;
         this.maxDefenceStrength = maxDefenceStrength;
         this.sector = sector;
+        this.fleet = null;      // No fleet alignment by default
 
         // Set values to maximum initially
         health = maxHealth;
         defenceStrength = maxDefenceStrength;
     }
 
+    /**
+     * Returns the unique id of this <code>Entity</code>
+     *
+     * @return a <code>long</code> id
+     */
+    public long getId()
+    {
+        return id;
+    }
 
     /**
      * Calculates the current defence strength of this entity. Declared <code>abstract</code>
@@ -52,9 +62,23 @@ public abstract class Entity
     public abstract double getDefenceStrength();
 
 
+    /**
+     * Gets the remaining health of this entity
+     * @return a <code>double</code> for the health
+     */
     public double getHealth()
     {
         return health;
+    }
+
+
+    /**
+     * Gets the fleet this entity is a part of
+     * @return a <code>Fleet</code> object
+     */
+    public Fleet getFleet()
+    {
+        return fleet;
     }
 
 
@@ -83,6 +107,16 @@ public abstract class Entity
 
 
     /**
+     * Used to assign fleet ownership to entities. Not in the constructor to avoid long argument lists
+     * @param fleet the fleet that owns this <code>Entity</code>
+     */
+    void setFleet(Fleet fleet)
+    {
+        this.fleet = fleet;
+    }
+
+
+    /**
      * Subtracts the incoming damage, reduced by the <code>defenceStrength</code> of this entity.
      * Prevents <code>health</code> from falling below 0.
      *
@@ -97,15 +131,7 @@ public abstract class Entity
         this.health -= (health - Math.max(0.0, damage - getDefenceStrength()));
     }
 
-    /**
-     * Returns the unique id of this <code>Entity</code>
-     *
-     * @return a <code>long</code> id
-     */
-    public long getId()
-    {
-        return id;
-    }
+
 
 
     /**

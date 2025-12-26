@@ -2,9 +2,7 @@ package org.tom.entities;
 
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * The Starbase Entity. Inherits base values <code>maxHealth</code>, <code>maxDefenceStrength</code>, <code>position</code> from
@@ -20,7 +18,6 @@ public class Starbase extends Entity
 {
     private static final double maxDefenceStrength = 20;
     private static final double maxHealth = 500;
-
     private final List<Starship> dockedStarships;
 
 
@@ -95,21 +92,22 @@ public class Starbase extends Entity
         // Check if this starbase is destroyed
         if (destroyed)
         {
-            logger.info("{} has been destroyed. Cannot dock starships", this);
+            logger.debug("{} has been destroyed. Cannot dock starships", this);
             return false;
         }
 
         // If the starship is part of the same fleet
         if (!Objects.equals(starship.getFleet(), this.getFleet()))
         {
-            logger.info("Cannot dock {} to {}; not in same fleet", starship, this);
+            logger.debug("Cannot dock {} to {}; not in same fleet", starship, this);
             return false;
         }
 
         // If the starship is not destroyed
         if (starship.isDestroyed())
         {
-            logger.info("{} is destroyed, cannot dock to {}", starship, this);
+            logger.debug("{} is destroyed, cannot dock to {}", starship, this);
+            return false;
         }
 
         // If the starship is not docked to this (or any other) starbase
@@ -159,7 +157,14 @@ public class Starbase extends Entity
         {
             // If not, log it
             logger.debug("{} is not docked to {}, cannot undock", starship, this);
+            logger.debug("docked {}", starship.getDocked());
             return false;
         }
 }
+
+
+    public List<Starship> getDockedStarships()
+    {
+        return Collections.unmodifiableList(dockedStarships);
+    }
 }

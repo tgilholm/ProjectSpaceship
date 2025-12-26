@@ -136,33 +136,32 @@ public abstract class Entity
      */
     public void takeDamage(double damage)
     {
-        if (!destroyed)
-        {
-            // Incoming damage is damage-defenceStrength, or 5, whichever is higher
-            // If damage - defence strength < 5, the damage applied is 5.
-            // If the damage is higher than the remaining health, health is set to 0.
-            double appliedDamage = Math.min(Math.max(5, damage - getDefenceStrength()), this.health);
-
-            this.setHealth(health - appliedDamage);
-
-            logger.debug("{} taking {} damage. Remaining health: {}", this, appliedDamage, getHealth());
-        } else
+        if (destroyed)
         {
             logger.info("{} has been destroyed. Taking 0 damage", this);
         }
+
+        // Incoming damage is damage-defenceStrength, or 5, whichever is higher
+        // If damage - defence strength < 5, the damage applied is 5.
+        // If the damage is higher than the remaining health, health is set to 0.
+        double appliedDamage = Math.min(Math.max(5, damage - getDefenceStrength()), this.health);
+
+        this.setHealth(health - appliedDamage);
+        logger.debug("{} taking {} damage. Remaining health: {}", this, appliedDamage, getHealth());
     }
 
 
-    /**
-     * Overrides <code>toString</code> in <code>Object</code>. Outputs the class name
-     * and unique ID for logging
-     *
-     * @return a <code>String</code> output of this object
-     */
-    @Override
-    public String toString()
-    {
-        // Gets the class name (e.g. Starship), then appends "#id" where id is the unique id
-        return "{" + getFleet() + "} " + getClass().getSimpleName() + "#" + id;
-    }
+
+/**
+ * Overrides <code>toString</code> in <code>Object</code>. Outputs the class name
+ * and unique ID for logging
+ *
+ * @return a <code>String</code> output of this object
+ */
+@Override
+public String toString()
+{
+    // Gets the class name (e.g. Starship), then appends "#id" where id is the unique id
+    return "{" + getFleet() + "} " + getClass().getSimpleName() + "#" + id;
+}
 }

@@ -146,10 +146,11 @@ public class Fleet
             if (!this.starships.contains(s) || !starbases.contains(starbase))
             {
                 logger.info("Cannot dock: ship {} or base {} not in {}", s, starbase, this);
-            } else
-            {
-                s.dockToStarbase(starbase);
+                continue;
             }
+
+            // Dock the starbase if the check succeeded
+            s.dockToStarbase(starbase);
         }
     }
 }

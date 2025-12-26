@@ -25,7 +25,6 @@ public class Starship extends Entity
 
     private boolean docked;
     private boolean repairing;
-    private int skipCounter;        // Holds the number of turns to skip when repairing
     private int crew;
     private Starbase starbase;
 
@@ -100,30 +99,29 @@ public class Starship extends Entity
     void setSector(@NonNull Sector newSector)
     {
         // Only allow movement if not destroyed
-        if (!this.destroyed)
-        {
-            // Only allow movement if undocked
-            if (!this.docked)
-            {
-                logger.info("Moving {} from sector: {} to: {}", this, getSector(), newSector);
-                this.sector = newSector;
-            } else
-            {
-                // Check if repairing
-                if (this.repairing)
-                {
-                    // Skip the move and repair instead
-                    repair();
-                    logger.info("{} is repairing. Skipping move.", this);
-                } else
-                {
-                    logger.info("{} is docked and cannot move", this);
-                }
-            }
-        } else
+        if (this.destroyed)
         {
             logger.info("{} has been destroyed and cannot move", this);
         }
+
+        // Only allow movement if undocked
+        if (this.docked)
+        {
+            // Check if repairing
+            if (this.repairing)
+            {
+                // Skip the move and repair instead
+                repair();
+                logger.info("{} is repairing. Skipping move.", this);
+            } else
+            {
+                logger.info("{} is docked and cannot move", this);
+            }
+        }
+
+        // Make the move if all checks succeeded
+        logger.info("Moving {} from sector: {} to: {}", this, getSector(), newSector);
+        this.sector = newSector;
     }
 
 
@@ -178,51 +176,53 @@ public class Starship extends Entity
      */
     public void undockFromStarbase(@NonNull Starbase starbase)
     {
-        if (!this.destroyed)
-        {
-            if (starbase.undockStarship(this))
-            {
-                // Remove starbase reference
-                this.docked = false;
-                this.starbase = null;
-            }
-        } else
+        if (this.destroyed)
         {
             logger.info("{} has been destroyed and cannot undock", this);
+        }
+
+        if (starbase.undockStarship(this))
+        {
+            // Remove starbase reference
+            this.docked = false;
+            this.starbase = null;
         }
     }
 
 
     public void repair()
     {
-        if (!destroyed)
-        {
-            if (docked)
-            {
-                repairing = true;
-
-                // Below 25%
-                if (health < maxHealth * 0.25)
-                {
-                    this.setHealth(maxHealth * 0.25);
-                } else if (health >= maxHealth * 0.25 && health < maxHealth * 0.5)  // Between 25% and 50%
-                {
-                    this.setHealth(maxHealth * 0.5);
-                } else if (health >= maxHealth * 0.5 && health < maxHealth * 0.75)    // Between 50% and 75%
-                {
-                    this.setHealth(maxHealth * 0.75);
-                } else
-                {           // Above 75%, just repair fully & stop repairing
-                    this.setHealth(maxHealth);
-                    repairing = false;
-                }
-            } else
-            {
-                logger.info("Cannot repair, {} is undocked", this);
-            }
-        } else
+        // Check if destroyed
+        if (destroyed)
         {
             logger.info("{} has been destroyed and cannot repair", this);
+        }
+
+        // Check if docked
+        if (!docked)
+        {
+            logger.info("Cannot repair, {} is undocked", this);
+        }
+
+
+        // Repair if all checks succeeded
+        repairing = true;
+
+        // Below 25%
+        if (health < maxHealth * 0.25)
+        {
+            this.setHealth(maxHealth * 0.25);
+        } else if (health >= maxHealth * 0.25 && health < maxHealth * 0.5)  // Between 25% and 50%
+        {
+            this.setHealth(maxHealth * 0.5);
+        } else if (health >= maxHealth * 0.5 && health < maxHealth * 0.75)    // Between 50% and 75%
+        {
+            this.setHealth(maxHealth * 0.75);
+        } else
+        {
+            // Above 75%, just repair fully & stop repairing
+            this.setHealth(maxHealth);
+            repairing = false;
         }
     }
 
@@ -237,77 +237,74 @@ public class Starship extends Entity
     public void attack(@NonNull Entity target)
     {
         // Check if destroyed
-        if (!destroyed)
-        {
-            // Check if undocked
-            if (!this.docked)
-            {
-                // Check if both entities are in the same sector
-                if (target.getSector().equals(this.sector))
-                {
-                    // Check if the target is in the same fleet
-                    if (!Objects.equals(target.getFleet(), this.getFleet()))
-                    {
-                        logger.info("{} attacking entity: {}", this, target);
-                        target.takeDamage(getAttackStrength());
-                    } else
-                    {
-                        logger.info("{} cannot attack {}, they are in the same fleet", this, target);
-                    }
-                } else
-                {
-                    logger.info("{} cannot attack entity: {} - they are not in the same sector", this, target);
-                }
-
-            } else
-            {
-                // Check if repairing
-                if (this.repairing)
-                {
-                    // If so, skip the move and repair instead
-                    repair();
-                    logger.info("{} is repairing. Skipping attack move.", this);
-                } else
-                {
-                    logger.info("{} is docked and cannot attack", this);
-                }
-            }
-        } else
+        if (destroyed)
         {
             logger.info("{} has been destroyed and cannot attack", this);
+        }
+
+        // Check if undocked
+        if (this.docked)
+        {
+            // Check if repairing
+            if (this.repairing)
+            {
+                // If so, skip the move and repair instead
+                repair();
+                logger.info("{} is repairing. Skipping attack move.", this);
+            } else
+            {
+                logger.info("{} is docked and cannot attack", this);
+            }
+        }
+
+        // Check if both entities are in the same sector
+        if (!target.getSector().equals(this.sector))
+        {
+            logger.info("{} cannot attack entity: {} - they are not in the same sector", this, target);
+        }
+
+        // Check if the target is in the same fleet
+        if (!Objects.equals(target.getFleet(), this.getFleet()))
+        {
+            logger.info("{} attacking entity: {}", this, target);
+            target.takeDamage(getAttackStrength());
+        } else
+        {
+            logger.info("{} cannot attack {}, they are in the same fleet", this, target);
         }
     }
 
 
-    /**
-     * Overrides the <code>takeDamage</code> method from <code>Entity</code>.
-     * Executes the base method and then removes crew
-     *
-     * @param damage the incoming damage, as a <code>double</code>
-     */
-    @Override
-    public void takeDamage(double damage)
-    {
-        super.takeDamage(damage);
-        double appliedDamage = Math.min(Math.max(5, damage - defenceStrength), this.health);
 
-        // Remove crew based on applied damage, not total damage
-        int crewLost = calculateCrewLost(appliedDamage);
-        setCrew(crew - crewLost);
-        logger.debug("{} lost {} crew, remaining crew: {}", this, crewLost, crew);
-    }
+/**
+ * Overrides the <code>takeDamage</code> method from <code>Entity</code>.
+ * Executes the base method and then removes crew
+ *
+ * @param damage the incoming damage, as a <code>double</code>
+ */
+@Override
+public void takeDamage(double damage)
+{
+    super.takeDamage(damage);
+    double appliedDamage = Math.min(Math.max(5, damage - defenceStrength), this.health);
+
+    // Remove crew based on applied damage, not total damage
+    int crewLost = calculateCrewLost(appliedDamage);
+    setCrew(crew - crewLost);
+    logger.debug("{} lost {} crew, remaining crew: {}", this, crewLost, crew);
+}
 
 
-    /**
-     * Helper method to calculate the amount of crew lost based on the current crew and the
-     * ratio between the attack damage and the max health of this <code>Starship</code>
-     *
-     * @param damage the incoming damage, as a <code>double</code>
-     * @return the amount of crew lost, as an <code>int</code>
-     */
-    int calculateCrewLost(double damage)
-    {
-        return Math.round((float) (damage / maxHealth) * crew);
-    }
+/**
+ * Helper method to calculate the amount of crew lost based on the current crew and the
+ * ratio between the attack damage and the max health of this <code>Starship</code>
+ *
+ * @param damage the incoming damage, as a <code>double</code>
+ * @return the amount of crew lost, as an <code>int</code>
+ */
+int calculateCrewLost(double damage)
+{
+    return Math.round((float) (damage / maxHealth) * crew);
+}
 
 }

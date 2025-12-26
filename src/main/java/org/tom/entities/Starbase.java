@@ -60,7 +60,7 @@ public class Starbase extends Entity
         }
 
         // Calculate final defence strength
-        double defenceStrength = (maxDefenceStrength * (health / maxHealth)) + (dockedTotal * (dockedCount / maxDefenceStrength));
+        double defenceStrength = (maxDefenceStrength * (health / maxHealth)) + (dockedTotal * ((double) dockedCount / maxDefenceStrength));
         logger.debug("Defence strength of {} is {}", this, defenceStrength);
         return defenceStrength;
     }
@@ -74,8 +74,12 @@ public class Starbase extends Entity
     double getDockedShipsStrength(@NonNull List<Starship> dockedStarships)
     {
         // Get the sum of the defence strength of each ship
+        // Only adds the defence strength of ships that are non-null and not destroyed
         return dockedStarships.stream()
-                .map(Starship::getDefenceStrength).mapToDouble(Double::doubleValue).sum();
+                .filter(s -> s != null && !s.isDestroyed())
+                .map(Starship::getDefenceStrength)
+                .mapToDouble(Double::doubleValue)
+                .sum();
     }
 
 
@@ -89,31 +93,35 @@ public class Starbase extends Entity
     public boolean dockStarship(@NonNull Starship starship)
     {
         // Check if this starbase is destroyed
-        if (!destroyed)
-        {
-            // If the starship is part of the same fleet
-            if (Objects.equals(starship.getFleet(), this.getFleet()))
-            {
-                // If the starship is not docked to this (or any other) starbase
-                if (!starship.getDocked() && !(this.dockedStarships.contains(starship)))
-                {
-                    // Add it to the list
-                    this.dockedStarships.add(starship);
-                    logger.info("Docked {} to {}", starship, this);
-                    return true;
-                } else
-                {
-                    logger.debug("Cannot dock {} to {}", starship, this);
-                    return false;
-                }
-            } else
-            {
-                logger.debug("Cannot dock {} to {}; not in same fleet", starship, this);
-                return false;
-            }
-        } else
+        if (destroyed)
         {
             logger.info("{} has been destroyed. Cannot dock starships", this);
+            return false;
+        }
+
+        // If the starship is part of the same fleet
+        if (!Objects.equals(starship.getFleet(), this.getFleet()))
+        {
+            logger.info("Cannot dock {} to {}; not in same fleet", starship, this);
+            return false;
+        }
+
+        // If the starship is not destroyed
+        if (starship.isDestroyed())
+        {
+            logger.info("{} is destroyed, cannot dock to {}", starship, this);
+        }
+
+        // If the starship is not docked to this (or any other) starbase
+        if (!starship.getDocked() && !(this.dockedStarships.contains(starship)))
+        {
+            // Add it to the list
+            this.dockedStarships.add(starship);
+            logger.info("Docked {} to {}", starship, this);
+            return true;
+        } else
+        {
+            logger.debug("Cannot dock {} to {}", starship, this);
             return false;
         }
     }
@@ -129,31 +137,29 @@ public class Starbase extends Entity
     public boolean undockStarship(@NonNull Starship starship)
     {
         // Check if this starbase is destroyed
-        if (!destroyed)
-        {
-            // If the starship is part of the same fleet
-            if (Objects.equals(starship.getFleet(), this.getFleet()))
-            {
-                // If in the list, remove it
-                if (starship.getDocked() && this.dockedStarships.remove(starship))
-                {
-                    logger.info("Undocked {} from {}", starship, this);
-                    return true;
-                } else
-                {
-                    // If not, log it
-                    logger.debug("{} is not docked to {}, cannot undock", starship, this);
-                    return false;
-                }
-            } else
-            {
-                logger.debug("Cannot undock {} from {}; not in same fleet", starship, this);
-                return false;
-            }
-        } else
+        if (destroyed)
         {
             logger.info("{} has been destroyed. Cannot undock starships", this);
             return false;
         }
-    }
+
+        // Check both objects are in the same fleet
+        if (!Objects.equals(starship.getFleet(), this.getFleet()))
+        {
+            logger.debug("Cannot undock {} from {}; not in same fleet", starship, this);
+            return false;
+        }
+
+        // If in the list, remove it
+        if (starship.getDocked() && this.dockedStarships.remove(starship))
+        {
+            logger.info("Undocked {} from {}", starship, this);
+            return true;
+        } else
+        {
+            // If not, log it
+            logger.debug("{} is not docked to {}, cannot undock", starship, this);
+            return false;
+        }
+}
 }

@@ -88,6 +88,17 @@ public abstract class Entity
 
 
     /**
+     * Returns the destroyed status of this entity
+     *
+     * @return true if destroyed, false otherwise
+     */
+    public boolean isDestroyed()
+    {
+        return destroyed;
+    }
+
+
+    /**
      * Sets the health of this <code>Entity</code> from a provided <code>newHealth</code>. Prevents
      * negative health by selecting the largest value from 0 or newHealth- if newHealth is negative,
      * health is set to 0. Uses <code>Math.min</code> to prevent health values above maximum

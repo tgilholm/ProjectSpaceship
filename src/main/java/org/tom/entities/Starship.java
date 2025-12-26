@@ -197,7 +197,9 @@ public class Starship extends Entity
         super.takeDamage(damage);
 
         // Remove crew
-        setCrew(crew - calculateCrewLost(damage));
+        int crewLost = calculateCrewLost(damage);
+        setCrew(crew - crewLost);
+        logger.debug("{} lost {} crew, remaining crew: {}", this, crewLost, crew);
     }
 
 

@@ -34,8 +34,13 @@ class StarbaseTest
     @BeforeEach
     void setStarships()
     {
-        // Add some example starships
+        // Add some example starships and set them to a fleet
         starships = List.of(new Starship[]{new Starship(sector), new Starship(sector), new Starship(sector)});
+
+        for (Starship s : starships)
+        {
+            s.setFleet(new Fleet(new Player(1)));
+        }
     }
 
 

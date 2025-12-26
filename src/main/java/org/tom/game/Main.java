@@ -15,8 +15,6 @@ public class Main
      */
     static void main(String[] args)
     {
-        System.out.println("Creating fleets");
-
         // Create players
         Player player1 = new Player(1);
         Player player2 = new Player(2);

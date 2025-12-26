@@ -4,6 +4,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The Starbase Entity. Inherits base values <code>maxHealth</code>, <code>maxDefenceStrength</code>, <code>position</code> from
@@ -25,7 +26,7 @@ public class Starbase extends Entity
 
     /**
      * Sets the base values for a Starbase. Passes the static final maximum values to the parent constructor
-     * and initialises <code>dockedStarships</code>.
+     * and initializes <code>dockedStarships</code>.
      *
      * @param position the starting position of the entity
      */
@@ -85,16 +86,24 @@ public class Starbase extends Entity
      */
     public boolean dockStarship(@NonNull Starship starship)
     {
-        // If the starship is not docked to this (or any other) starbase
-        if (!starship.getDocked() && !(this.dockedStarships.contains(starship)))
+        // If the starship is part of the same fleet
+        if (Objects.equals(starship.getFleet(), this.getFleet()))
         {
-            // Add it to the list
-            this.dockedStarships.add(starship);
-            logger.info("Docked starship: {} to starbase: {}", starship, this);
-            return true;
+            // If the starship is not docked to this (or any other) starbase
+            if (!starship.getDocked() && !(this.dockedStarships.contains(starship)))
+            {
+                // Add it to the list
+                this.dockedStarships.add(starship);
+                logger.info("Docked starship: {} to starbase: {}", starship, this);
+                return true;
+            } else
+            {
+                logger.debug("Cannot dock starship: {} to starbase: {}", starship, this);
+                return false;
+            }
         } else
         {
-            logger.info("Cannot dock starship: {} to starbase: {}", starship, this);
+            logger.debug("Cannot dock starship: {} to starbase: {}; not in same fleet", starship, this);
             return false;
         }
     }
@@ -109,15 +118,23 @@ public class Starbase extends Entity
      */
     public boolean undockStarship(@NonNull Starship starship)
     {
-        // If in the list, remove it
-        if (starship.getDocked() && this.dockedStarships.remove(starship))
+        // If the starship is part of the same fleet
+        if (Objects.equals(starship.getFleet(), this.getFleet()))
         {
-            logger.info("Undocked starship: {} from starbase: {}", starship, this);
-            return true;
+            // If in the list, remove it
+            if (starship.getDocked() && this.dockedStarships.remove(starship))
+            {
+                logger.info("Undocked starship: {} from starbase: {}", starship, this);
+                return true;
+            } else
+            {
+                // If not, log it
+                logger.debug("Starship: {} is not docked to starbase: {}, cannot undock", starship, this);
+                return false;
+            }
         } else
         {
-            // If not, log it
-            logger.info("Starship: {} is not docked to starbase: {}, cannot undock", starship, this);
+            logger.debug("Cannot undock starship: {} from starbase: {}; not in same fleet", starship, this);
             return false;
         }
     }

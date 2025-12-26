@@ -43,15 +43,6 @@ public abstract class Entity
         defenceStrength = maxDefenceStrength;
     }
 
-    /**
-     * Returns the unique id of this <code>Entity</code>
-     *
-     * @return a <code>long</code> id
-     */
-    public long getId()
-    {
-        return id;
-    }
 
     /**
      * Calculates the current defence strength of this entity. Declared <code>abstract</code>
@@ -124,12 +115,15 @@ public abstract class Entity
      */
     public void takeDamage(double damage)
     {
+        //Incoming damage is damage-defenceStrength, or 5, whichever is higher
+        damage = Math.max(5, damage - defenceStrength);
+
         /*
         If damage minus defenceStrength results in a negative number,
         take away 0 health instead of adding health
          */
-        this.setHealth(health - Math.max(0.0, damage - getDefenceStrength()));
-        logger.info("{} taking {} damage. Remaining health: {}", this, damage, getHealth());
+        this.setHealth(health - Math.max(0.0, damage));
+        logger.debug("{} taking {} damage. Remaining health: {}", this, damage, getHealth());
     }
 
 

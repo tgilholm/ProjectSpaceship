@@ -128,7 +128,7 @@ public abstract class Entity
         If damage minus defenceStrength results in a negative number,
         take away 0 health instead of adding health
          */
-        this.health -= (health - Math.max(0.0, damage - getDefenceStrength()));
+        this.setHealth(health - Math.max(0.0, damage - getDefenceStrength()));
     }
 
 

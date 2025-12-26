@@ -64,13 +64,38 @@ class StarshipTest
 
 
     @Test
+    @DisplayName("takeDamage should apply max(5, attack - defence) and reduce crew accordingly")
     void takeDamage()
+    {
+        // Starship initial: health=100, crew=10, defence strength (computed) == 10
+        // Attacker attack = 30 -> net = max(5, 30 - 10) = 20
+        starship.takeDamage(30);
+
+        assertEquals(80.0, starship.getHealth(), delta, "Health should reduce by 20");
+        assertEquals(8, starship.getCrew(), "Crew should reduce by 2 (20% of 10)");
+    }
+
+
+    @Test
+    @DisplayName("calculateCrewLost uses applied damage proportionally")
+    void calculateCrewLost()
+    {
+        // With default crew 10, 20 damage should kill 2 crew members
+        int lost = starship.calculateCrewLost(20.0);
+        assertEquals(2, lost);
+    }
+
+
+    @Test
+    @DisplayName("Starships should be unable to take actions while repairing")
+    void repair()
     {
     }
 
 
     @Test
-    void calculateCrewLost()
+    @DisplayName("Starships can inflict damage on entities of all types")
+    void attack()
     {
     }
 }

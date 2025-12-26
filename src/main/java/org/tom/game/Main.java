@@ -1,7 +1,4 @@
 package org.tom.game;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.tom.entities.*;
 
 
@@ -56,7 +53,7 @@ public class Main
         fleet2.getStarshipAt(2).ifPresent(starship ->
                 fleet2.getStarbaseAt(0).ifPresent(starbase -> {
                     starship.dockToStarbase(starbase);
-                    starship.repair();  // todo implement repair
+                    starship.repair();
                 }));
 
         // Command fleet1 to attack fleet2's starbase until it is destroyed
@@ -65,6 +62,7 @@ public class Main
             {
                 fleet1.attackWithAll(starbase);
             }
+            System.out.println("All of player 2's starbases are destroyed. Player 1 wins!");
         });
     }
 }

@@ -20,6 +20,7 @@ public abstract class Entity
     protected double health;
     protected double defenceStrength;
     protected Sector sector;
+    protected boolean destroyed;     // If this entity has been destroyed
 
 
     /**
@@ -28,7 +29,7 @@ public abstract class Entity
      *
      * @param maxHealth          the maximum total health
      * @param maxDefenceStrength the maximum resistance to damage
-     * @param sector           the starting position of the entity
+     * @param sector             the starting position of the entity
      */
     public Entity(double maxHealth, double maxDefenceStrength, Sector sector)
     {
@@ -55,6 +56,7 @@ public abstract class Entity
 
     /**
      * Gets the remaining health of this entity
+     *
      * @return a <code>double</code> for the health
      */
     public double getHealth()
@@ -65,6 +67,7 @@ public abstract class Entity
 
     /**
      * Gets the fleet this entity is a part of
+     *
      * @return a <code>Fleet</code> object
      */
     public Fleet getFleet()
@@ -94,11 +97,18 @@ public abstract class Entity
     public void setHealth(double newHealth)
     {
         this.health = Math.max(0.0, Math.min(newHealth, maxHealth));
+
+        if (this.health == 0)
+        {
+            this.destroyed = true;
+            logger.info("{} has been destroyed", this);
+        }
     }
 
 
     /**
      * Used to assign fleet ownership to entities. Not in the constructor to avoid long argument lists
+     *
      * @param fleet the fleet that owns this <code>Entity</code>
      */
     public void setFleet(Fleet fleet)
@@ -115,29 +125,33 @@ public abstract class Entity
      */
     public void takeDamage(double damage)
     {
-        //Incoming damage is damage-defenceStrength, or 5, whichever is higher
-        damage = Math.max(5, damage - defenceStrength);
+        if (!destroyed)
+        {
+            // Incoming damage is damage-defenceStrength, or 5, whichever is higher
+            // If damage - defence strength < 5, the damage applied is 5.
+            // If the damage is higher than the remaining health, health is set to 0.
+            double appliedDamage = Math.min(Math.max(5, damage - getDefenceStrength()), this.health);
 
-        /*
-        If damage minus defenceStrength results in a negative number,
-        take away 0 health instead of adding health
-         */
-        this.setHealth(health - Math.max(0.0, damage));
-        logger.debug("{} taking {} damage. Remaining health: {}", this, damage, getHealth());
+            this.setHealth(health - appliedDamage);
+
+            logger.debug("{} taking {} damage. Remaining health: {}", this, appliedDamage, getHealth());
+        } else
+        {
+            logger.info("{} has been destroyed. Taking 0 damage", this);
+        }
     }
-
-
 
 
     /**
      * Overrides <code>toString</code> in <code>Object</code>. Outputs the class name
      * and unique ID for logging
+     *
      * @return a <code>String</code> output of this object
      */
     @Override
     public String toString()
     {
         // Gets the class name (e.g. Starship), then appends "#id" where id is the unique id
-        return getClass().getSimpleName() + "#" + id;
+        return "{" + getFleet() + "} " + getClass().getSimpleName() + "#" + id;
     }
 }

@@ -14,6 +14,7 @@ class StarbaseTest
 {
     private List<Starship> starships;
     private static Sector sector;
+    private static Fleet fleet;
     private Starbase starbase;
     public static final double delta = 1e-9;
 
@@ -27,6 +28,11 @@ class StarbaseTest
         sector = new Sector(0, 0);
     }
 
+    @BeforeAll
+    static void setFleet()
+    {
+        fleet = new Fleet(new Player(1));
+    }
 
     /**
      * Creates a new list of starships in the start sector
@@ -39,15 +45,19 @@ class StarbaseTest
 
         for (Starship s : starships)
         {
-            s.setFleet(new Fleet(new Player(1)));
+            s.setFleet(fleet);
         }
     }
 
 
+    /**
+     * Creates a new starbase and sets the fleet
+     */
     @BeforeEach
     void setStarbase()
     {
         starbase = new Starbase(sector);
+        starbase.setFleet(fleet);
     }
 
 
@@ -89,5 +99,12 @@ class StarbaseTest
         double expectedStarbaseDefence = 24.5;
         assertEquals(expectedStarbaseDefence, starbase.getDefenceStrength(), delta,
                 "Starbase defence strength should be 24.5 when 3 fresh starships are docked");
+    }
+
+
+    @Test
+    @DisplayName("Test docking in-fleet, out-fleet and destroyed ships")
+    void dockStarship()
+    {
     }
 }

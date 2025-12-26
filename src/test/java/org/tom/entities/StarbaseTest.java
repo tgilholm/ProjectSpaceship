@@ -14,6 +14,7 @@ class StarbaseTest
 {
     private List<Starship> starships;
     private static Sector sector;
+    private static Fleet fleet;
     private Starbase starbase;
     public static final double delta = 1e-9;
 
@@ -27,6 +28,11 @@ class StarbaseTest
         sector = new Sector(0, 0);
     }
 
+    @BeforeAll
+    static void setFleet()
+    {
+        fleet = new Fleet(new Player(1));
+    }
 
     /**
      * Creates a new list of starships in the start sector
@@ -39,15 +45,19 @@ class StarbaseTest
 
         for (Starship s : starships)
         {
-            s.setFleet(new Fleet(new Player(1)));
+            s.setFleet(fleet);
         }
     }
 
 
+    /**
+     * Creates a new starbase and sets the fleet
+     */
     @BeforeEach
     void setStarbase()
     {
         starbase = new Starbase(sector);
+        starbase.setFleet(fleet);
     }
 
 
@@ -89,5 +99,54 @@ class StarbaseTest
         double expectedStarbaseDefence = 24.5;
         assertEquals(expectedStarbaseDefence, starbase.getDefenceStrength(), delta,
                 "Starbase defence strength should be 24.5 when 3 fresh starships are docked");
+    }
+
+
+    @Test
+    @DisplayName("Test docking in-fleet, out-fleet and destroyed ships")
+    void dockStarship()
+    {
+        // Dock in-fleet ships
+        for (Starship s : starships)
+        {
+            assertTrue(starbase.dockStarship(s), "Should dock ship belonging to same fleet");
+        }
+
+        // Out-of-fleet ship should not dock
+        Fleet otherFleet = new Fleet(new Player(2));
+        Starship outsider = new Starship(sector);
+        outsider.setFleet(otherFleet);
+        assertFalse(starbase.dockStarship(outsider), "Ship from another fleet should not be able to dock");
+
+        // Destroyed ship should not dock
+        Starship dead = new Starship(sector);
+        dead.setFleet(fleet);
+        dead.takeDamage(1000); // ensure destroyed
+        assertTrue(dead.isDestroyed(), "Ship should be destroyed");
+        assertFalse(starbase.dockStarship(dead), "Destroyed ship should not be allowed to dock");
+    }
+
+
+    @Test
+    @DisplayName("Test undocking in-fleet ships")
+    void undockStarship()
+    {
+        // Dock all ships
+        for (Starship s : starships)
+        {
+            s.dockToStarbase(starbase);
+        }
+
+        assertEquals(3, starbase.getDockedStarships().size(), "Three ships are docked");
+
+        // Undock one
+        boolean removed = starbase.undockStarship(starships.getFirst());
+        assertTrue(removed, "Undocking should succeed for docked ship");
+        assertEquals(2, starbase.getDockedStarships().size(), "Two ships should remain docked");
+
+        // Undocking a non-docked ship should fail
+        Starship notDocked = new Starship(sector);
+        notDocked.setFleet(fleet);
+        assertFalse(starbase.undockStarship(notDocked), "Cannot undock a ship that is not docked");
     }
 }

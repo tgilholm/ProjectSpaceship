@@ -11,9 +11,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class Entity
 {
     protected static final Logger logger = LogManager.getLogger();
+    private static final AtomicLong NEXT_ID = new AtomicLong(1); // Used for entity IDs
     protected final double maxHealth;
     protected final double maxDefenceStrength;
-    private static final AtomicLong NEXT_ID = new AtomicLong(1); // Used for entity IDs
+    private Fleet fleet;      // The fleet this entity is in
     private final long id;
 
     protected double health;
@@ -35,12 +36,22 @@ public abstract class Entity
         this.maxHealth = maxHealth;
         this.maxDefenceStrength = maxDefenceStrength;
         this.sector = sector;
+        this.fleet = null;      // No fleet alignment by default
 
         // Set values to maximum initially
         health = maxHealth;
         defenceStrength = maxDefenceStrength;
     }
 
+    /**
+     * Returns the unique id of this <code>Entity</code>
+     *
+     * @return a <code>long</code> id
+     */
+    public long getId()
+    {
+        return id;
+    }
 
     /**
      * Calculates the current defence strength of this entity. Declared <code>abstract</code>
@@ -51,9 +62,23 @@ public abstract class Entity
     public abstract double getDefenceStrength();
 
 
+    /**
+     * Gets the remaining health of this entity
+     * @return a <code>double</code> for the health
+     */
     public double getHealth()
     {
         return health;
+    }
+
+
+    /**
+     * Gets the fleet this entity is a part of
+     * @return a <code>Fleet</code> object
+     */
+    public Fleet getFleet()
+    {
+        return fleet;
     }
 
 
@@ -75,9 +100,19 @@ public abstract class Entity
      *
      * @param newHealth the new health <code>double</code>
      */
-    void setHealth(double newHealth)
+    public void setHealth(double newHealth)
     {
         this.health = Math.max(0.0, Math.min(newHealth, maxHealth));
+    }
+
+
+    /**
+     * Used to assign fleet ownership to entities. Not in the constructor to avoid long argument lists
+     * @param fleet the fleet that owns this <code>Entity</code>
+     */
+    public void setFleet(Fleet fleet)
+    {
+        this.fleet = fleet;
     }
 
 
@@ -93,18 +128,11 @@ public abstract class Entity
         If damage minus defenceStrength results in a negative number,
         take away 0 health instead of adding health
          */
-        this.health -= (health - Math.max(0.0, damage - getDefenceStrength()));
+        this.setHealth(health - Math.max(0.0, damage - getDefenceStrength()));
+        logger.info("{} taking {} damage. Remaining health: {}", this, damage, getHealth());
     }
 
-    /**
-     * Returns the unique id of this <code>Entity</code>
-     *
-     * @return a <code>long</code> id
-     */
-    public long getId()
-    {
-        return id;
-    }
+
 
 
     /**

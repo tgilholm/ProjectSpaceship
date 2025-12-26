@@ -1,6 +1,6 @@
 package org.tom.entities;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The Starship Entity inherits base values <code>maxHealth</code>, <code>maxDefenceStrength</code>, <code>position</code> from
@@ -94,7 +94,7 @@ public class Starship extends Entity
      *
      * @param newSector the new <code>Sector</code> object
      */
-    void setSector(@NotNull Sector newSector)
+    void setSector(@NonNull Sector newSector)
     {
         // Only allow movement if undocked
         if (!this.docked)
@@ -124,7 +124,7 @@ public class Starship extends Entity
      *
      * @param starbase the <code>Starbase</code> to dock to
      */
-    public void dockToStarbase(@NotNull Starbase starbase)
+    public void dockToStarbase(@NonNull Starbase starbase)
     {
         if (starbase.dockStarship(this))
         {
@@ -139,7 +139,7 @@ public class Starship extends Entity
      *
      * @param starbase the <code>Starbase</code> to undock from
      */
-    public void undockFromStarbase(@NotNull Starbase starbase)
+    public void undockFromStarbase(@NonNull Starbase starbase)
     {
         if (starbase.undockStarship(this))
         {
@@ -163,13 +163,13 @@ public class Starship extends Entity
      *
      * @param target the <code>Entity</code> to attack
      */
-    public void attack(@NotNull Entity target)
+    public void attack(@NonNull Entity target)
     {
         // Check if undocked
         if (!this.docked)
         {
             // Check if both entities are in the same sector
-            if (target.getSector() == this.sector)
+            if (target.getSector().equals(this.sector))
             {
                 logger.info("Starship: {} attacking entity: {}", this, target);
                 target.takeDamage(getAttackStrength());

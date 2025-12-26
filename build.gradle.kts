@@ -20,7 +20,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.25.3")
 
     // Annotations
-    implementation("org.jetbrains:annotations:16.0.2")
+    implementation("org.jspecify:jspecify:1.0.0")
 
 }
 tasks.test {

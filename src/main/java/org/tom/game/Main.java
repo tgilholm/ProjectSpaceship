@@ -10,7 +10,7 @@ public class Main
      *
      * @param args start arguments
      */
-    static void main(String[] args)
+    public static void main(String[] args)
     {
         // Create players
         Player player1 = new Player(1);
